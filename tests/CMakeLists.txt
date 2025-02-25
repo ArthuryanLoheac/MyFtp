@@ -1,4 +1,4 @@
-file(GLOB_RECURSE TEST_SRC "./**/*.cpp" "../src/**.cpp")
+file(GLOB_RECURSE TEST_SRC "./**.cpp" "../src/**.cpp")
 
 add_executable(unit_tests ${TEST_SRC})
 
