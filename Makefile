@@ -37,8 +37,7 @@ EXTENSION = cpp
 
 # ============= FLAGS ============= #
 
-FLAGS = -I./include -lsfml-graphics -lsfml-window \
-		-lsfml-system -std=c++20 -MMD -MP \
+FLAGS = -I./include -I./src -std=c++20 -MMD -MP \
 
 FLAGS_TEST = -std=c++20 -Wall -Wextra -Werror \
 			-lcriterion --coverage \
@@ -57,9 +56,9 @@ SRC_LIB	=	\
 
 SRC_MAIN	=	main.cpp \
 
-SRC	= 	\
+SRC	= 	$(shell find src -name "*.cpp") \
 
-SRC_TESTS	= 	tests/test_1.cpp \
+SRC_TESTS	= 	$(shell find tests -name "*.cpp") \
 
 # ============= RULES ============= #
 
@@ -88,7 +87,7 @@ fclean: clean
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(dir $@)
-	@printf "$(YEL)[⚒️] $(BLUE)Compiling, $(GREEN)$(@F)$(NC)\n"
+	@printf "$(YEL)[🔨] $(BLUE)Compiling, $(GREEN)$(@F)$(NC)\n"
 	$(COMPILER) -c $(CFLAGS) $< -o $@
 
 -include $(DEPS)

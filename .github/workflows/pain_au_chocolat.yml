@@ -54,9 +54,7 @@ jobs:
         uses: actions/checkout@v4
       - name: "Make"
         timeout-minutes: 2
-        run: make
-      - name: "Cleaning"
-        run: make clean
+        run: ./myBuild.sh
       - name: "Check existing executables"
         run: |
           LIST=$(echo $EXECUTABLES | tr ',' ' ')
@@ -70,7 +68,7 @@ jobs:
       - name: "Checkout"
         uses: actions/checkout@v4
       - name: "Make"
-        run: make
+        run: ./myBuild.sh
       - name: "Check banned functions"
         run: |
           liste_binaires=$(echo "$EXECUTABLES" | tr ',' '\n')
@@ -101,7 +99,9 @@ jobs:
         uses: actions/checkout@v4
       - name: "Launch tests"
         timeout-minutes: 2
-        run: make tests_run
+        run: |
+          ./myBuild.sh
+          ./unit_tests
   push_to_mirror: 
     needs: run_tests
     runs-on: ubuntu-latest
