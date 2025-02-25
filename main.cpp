@@ -11,7 +11,8 @@
 
 int startServer(int port, std::string path)
 {
-    
+    Server server(path, port);
+    server.run();
     return 0;
 }
 
@@ -33,7 +34,7 @@ int checkArgs(std::string port, std::string path)
             return 84;
     if (endPtr < port.c_str() + port.size())
         return 84;
-    return 0;
+    return startServer(portInt, path);
 }
 
 int main (int ac, char **av)

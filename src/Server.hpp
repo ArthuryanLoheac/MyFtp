@@ -7,6 +7,12 @@
 
 #pragma once
 #include <string>
+#include <vector>
+#include <iostream>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/poll.h>
 
 class Server
 {
@@ -14,18 +20,20 @@ class Server
         class socketClient
         {
             public:
-                int getSocket() { return socket; }
-                int getDataSocket() { return dataSocket; }
-                void setSocket(int socket) { this->socket = socket; }
-                void setDataSocket(int dataSocket) { this->dataSocket = dataSocket; }
-            protected:
-            private:
-                int socket;
-                int dataSocket;
+                struct pollfd socket;
+                struct pollfd dataSocket;
         };
+
+        Server(std::string path, int port);
+        std::vector<struct pollfd> getSockets();
+        void run();
     protected:
     private:
+        void eventNewClient();
+
+        std::vector<socketClient> clients;
         std::string path;
         int port;
-        int socket;
+        struct sockaddr_in server;
+        struct pollfd fdServer;
 };
