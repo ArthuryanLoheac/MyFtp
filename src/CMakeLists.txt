@@ -7,9 +7,9 @@ project(myftp)
 #Set the C++ standard to use
 set(CMAKE_CXX_STANDARD 20)
 
-file(GLOB_RECURSE NANO_SRC "./**.cpp")
+file(GLOB_RECURSE SRCS "./**.cpp" "../main.cpp")
 include_directories(${CMAKE_SOURCE_DIR}/include)
-file(GLOB_RECURSE HEADER_FILES "../include/**.hpp")
+file(GLOB_RECURSE HEADER_FILES "../include/**.hpp" "./**.hpp")
 
 foreach(HEADER_FILE ${HEADER_FILES})
     get_filename_component(HEADER_DIR ${HEADER_FILE} DIRECTORY)
@@ -17,4 +17,4 @@ foreach(HEADER_FILE ${HEADER_FILES})
 endforeach()
 
 #create exectuable hello from hello_world.c
-add_executable(${PROJECT_NAME} ${NANO_SRC})
+add_executable(${PROJECT_NAME} ${SRCS})
