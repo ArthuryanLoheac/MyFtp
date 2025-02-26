@@ -6,34 +6,40 @@
 */
 
 #pragma once
-#include <string>
-#include <vector>
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <sys/poll.h>
+#include <unistd.h>
+#include <poll.h>
+#include <vector>
+#include <string.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <fcntl.h>
 
 class Server
 {
     public:
-        class socketClient
-        {
+        class Client {
             public:
-                struct pollfd socket;
-                struct pollfd dataSocket;
+                Client(int client, struct sockaddr_in adr);
+                int client;
+                struct sockaddr_in adr;
+                struct pollfd pollfd;
+                int data;
         };
-
         Server(std::string path, int port);
-        std::vector<struct pollfd> getSockets();
+        void acceptClient();
+        void closeClient(int client);
         void run();
-    protected:
+        void readInClient(int client, int i);
     private:
-        void eventNewClient();
+        struct pollfd *getLstPoll();
+        void enteringPassiveMode(int client, int id);
 
-        std::vector<socketClient> clients;
-        std::string path;
-        int port;
-        struct sockaddr_in server;
-        struct pollfd fdServer;
+        int serverSocket;
+        struct sockaddr_in serverAddr;
+        std::vector<struct pollfd> lstPoll;
+        std::vector<Client> clients;
 };
