@@ -33,8 +33,9 @@ EXTENSION = cpp
 
 # ============= FLAGS ============= #
 
-FLAGS = -I./include -I./src $(shell find include src -type d -exec echo -I{} \;) \
-		-MMD -MP $(FLAGS_LIB) \
+FLAGS = -I./include -I./src \
+	$(shell find include src -type d -exec echo -I{} \;) \
+	-MMD -MP $(FLAGS_LIB) \
 
 FLAGS_TEST = $(FLAGS) -lcriterion --coverage \
 
@@ -94,8 +95,8 @@ run: all
 
 unit_tests:
 	@mkdir -p $(OBJ_DIR)
-	$(COMPILER) -o $(OBJ_DIR)/unit_tests $(SRC_TESTS) $(SRC) $(FLAGS) $(FLAGS_TEST)
-	cp $(OBJ_DIR)/unit_tests unit_tests 
+	$(COMPILER) -o $(OBJ_DIR)/unit_tests $(SRC_TESTS) $(SRC) $(FLAGS_TEST)
+	cp $(OBJ_DIR)/unit_tests unit_tests
 
 tests_run: unit_tests
 	./$(OBJ_DIR)/unit_tests --verbose
