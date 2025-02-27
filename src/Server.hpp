@@ -34,6 +34,7 @@ class Server
         void closeClient(int client);
         void run();
         void readInClient(int client, int i);
+        void acceptInData(int client, int i);
     private:
         struct pollfd *getLstPoll();
         void enteringPassiveMode(int client, int id);
@@ -41,6 +42,7 @@ class Server
         int serverSocket;
         struct sockaddr_in serverAddr;
         std::vector<struct pollfd> lstPoll;
+        std::vector<bool> lstIsData; // bool determine if it's a data or not
         std::vector<Client> clients;
         std::string _path;
 };

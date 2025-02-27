@@ -19,6 +19,13 @@ Server::Server(std::string path, int port)
     if (listen(serverSocket, 10) == -1)
         throw std::runtime_error("Error: listen failed");
     lstPoll.push_back({serverSocket, POLLIN, 0});
+    lstIsData.push_back(false);
+}
+
+void Server::acceptInData(int client, int i)
+{
+    accept(client, NULL, NULL);
+    clients[i].pollfd.revents = 0;
 }
 
 void Server::readInClient(int client, int i)
@@ -34,8 +41,11 @@ void Server::readInClient(int client, int i)
         closeClient(i);
     else if (strcmp(buffer, "PASV") == 0)
         enteringPassiveMode(client, i);
+    else if (strcmp(buffer, "OK") == 0)
+        write(client, "200 OK\n", 7);
     else
         printf("GOT: %s\n", buffer);
+    clients[i].pollfd.revents = 0;
 }
 
 struct pollfd *Server::getLstPoll()
@@ -92,9 +102,7 @@ void Server::enteringPassiveMode(int client, int id)
     //DATA connection
     listen(clients[id].data, 1);
     lstPoll.push_back({clients[id].data, POLLIN, 0});
-    if (accept(clients[id].data, NULL, NULL) == -1)
-        throw std::runtime_error("Error: accept failed");
-    printf("new data connection\n");
+    lstIsData.push_back(true);
 }
 
 void Server::acceptClient()
@@ -107,7 +115,8 @@ void Server::acceptClient()
         throw std::runtime_error("Error: accept failed");
     clients.push_back(Client(client, adr));
     lstPoll.push_back(clients[clients.size() - 1].pollfd);
-    printf("new client : %s %d\n", inet_ntoa(adr.sin_addr), ntohs(adr.sin_port));
+    lstIsData.push_back(false);
+    lstPoll[0].revents = 0;
 }
 
 void Server::closeClient(int id)
@@ -125,11 +134,18 @@ void Server::run()
         nbEvents = poll(getLstPoll(), clients.size() + 1, -1);
         if (nbEvents == -1)
             throw std::runtime_error("Error: poll failed");
-        if (lstPoll[0].revents & POLLIN)
-            acceptClient();
-        for (size_t i = 1; i < clients.size() + 1; i++) {
-            if (lstPoll[i].revents & POLLIN)
-                readInClient(clients[i - 1].client, i - 1);
+
+        for (int i = 0; i < nbEvents; i++) {
+            if (lstPoll[0].revents & POLLIN)
+                acceptClient();
+            for (size_t i = 1; i < clients.size() + 1; i++) {
+                if (lstPoll[i].revents & POLLIN) {
+                    if (lstIsData[i])
+                        acceptInData(clients[i - 1].data, i - 1);
+                    else
+                        readInClient(clients[i - 1].client, i - 1);
+                }
+            }
         }
     }
 }
