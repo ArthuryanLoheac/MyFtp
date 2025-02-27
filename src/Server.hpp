@@ -42,4 +42,5 @@ class Server
         struct sockaddr_in serverAddr;
         std::vector<struct pollfd> lstPoll;
         std::vector<Client> clients;
+        std::string _path;
 };

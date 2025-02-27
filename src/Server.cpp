@@ -11,8 +11,9 @@
 Server::Server(std::string path, int port)
 {
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
-    serverAddr = {AF_INET, htons(port), INADDR_ANY};
+    serverAddr = {AF_INET, htons(port), INADDR_ANY, 0};
 
+    _path = path;
     if (bind(serverSocket, (struct sockaddr *)&serverAddr, sizeof(serverAddr)) == 1)
         throw std::runtime_error("Error: bind failed");
     if (listen(serverSocket, 10) == -1)
@@ -60,7 +61,7 @@ static int getAddr()
     return addr.s_addr;
 }
 
-static void sendAddr(int addr, struct sockaddr_in adr, int client)
+static void sendAddr(struct sockaddr_in adr, int client)
 {
     int port1, port2, ip1, ip2, ip3, ip4 = 0;
     int adrresse = getAddr();
@@ -80,14 +81,14 @@ static void sendAddr(int addr, struct sockaddr_in adr, int client)
 void Server::enteringPassiveMode(int client, int id)
 {
     clients[id].data = socket(AF_INET, SOCK_STREAM, 0);
-    struct sockaddr_in adr = {AF_INET, htons(0), INADDR_ANY};
+    struct sockaddr_in adr = {AF_INET, htons(0), INADDR_ANY, 0};
     socklen_t len = sizeof(adr);
 
     if (bind(clients[id].data, (struct sockaddr *)&adr, sizeof(adr)) == 1)
         throw std::runtime_error("Error: bind failed");
     if (getsockname(clients[id].data, (struct sockaddr *)&adr, &len) == -1)
         throw std::runtime_error("Error: getsockname failed");
-    sendAddr(adr.sin_addr.s_addr, adr, client);
+    sendAddr(adr, client);
     //DATA connection
     listen(clients[id].data, 1);
     lstPoll.push_back({clients[id].data, POLLIN, 0});
@@ -100,7 +101,6 @@ void Server::acceptClient()
 {
     struct sockaddr_in adr;
     socklen_t adr_len = sizeof(adr);
-    int f;
 
     int client = accept(serverSocket, (struct sockaddr *)&adr, &adr_len);
     if (client == -1)
@@ -127,7 +127,7 @@ void Server::run()
             throw std::runtime_error("Error: poll failed");
         if (lstPoll[0].revents & POLLIN)
             acceptClient();
-        for (int i = 1; i < clients.size() + 1; i++) {
+        for (size_t i = 1; i < clients.size() + 1; i++) {
             if (lstPoll[i].revents & POLLIN)
                 readInClient(clients[i - 1].client, i - 1);
         }
