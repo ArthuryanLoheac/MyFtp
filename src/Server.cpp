@@ -41,8 +41,6 @@ void Server::readInClient(int client, int i)
         closeClient(i);
     else if (strcmp(buffer, "PASV") == 0)
         enteringPassiveMode(client, i);
-    else if (strcmp(buffer, "OK") == 0)
-        write(client, "200 OK\n", 7);
     else
         printf("GOT: %s\n", buffer);
     clients[i].pollfd.revents = 0;
