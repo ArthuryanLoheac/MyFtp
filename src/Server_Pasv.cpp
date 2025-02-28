@@ -45,16 +45,34 @@ static void sendAddr(struct sockaddr_in adr, int client)
 void Server::enteringPassiveMode(int client, int id)
 {
     id = id;
+    int *a = new int;
+    *a = 0;
     int data = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in adr = {AF_INET, htons(0), INADDR_ANY, 0};
     socklen_t len = sizeof(adr);
 
-    if (bind(data, (struct sockaddr *)&adr, sizeof(adr)) == 1)
+    if (bind(data, (struct sockaddr *)&adr, sizeof(adr)) == -1)
         throw std::runtime_error("Error: bind failed");
     if (getsockname(data, (struct sockaddr *)&adr, &len) == -1)
         throw std::runtime_error("Error: getsockname failed");
     sendAddr(adr, client);
     //DATA connection
     listen(data, 1);
-    lstPoll.push_back({data, POLLIN, 0});
+    int f = fork();
+    if (f == 0) {
+        printf("Data client waiting\n");
+        int dataClient = accept(data, NULL, NULL);
+        if (dataClient == -1) {
+            perror("Error: accept failed");
+            exit(1);
+        }
+        printf("Data client accepted\n");
+        *a = 2;
+        while (1);
+        close(dataClient);
+        exit(0);
+    } else {
+        sleep(20);
+        printf("%d\n", *a);
+    }
 }
