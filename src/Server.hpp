@@ -17,6 +17,7 @@
 #include <netdb.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <sstream>
 
 class Server
 {
@@ -26,23 +27,20 @@ class Server
                 Client(int client, struct sockaddr_in adr);
                 int client;
                 struct sockaddr_in adr;
-                struct pollfd pollfd;
-                int data;
         };
         Server(std::string path, int port);
         void acceptClient();
         void closeClient(int client);
         void run();
         void readInClient(int client, int i);
-        void acceptInData(int client, int i);
     private:
         struct pollfd *getLstPoll();
         void enteringPassiveMode(int client, int id);
+        void retrFile(int client, int id, std::string path);
 
         int serverSocket;
         struct sockaddr_in serverAddr;
         std::vector<struct pollfd> lstPoll;
-        std::vector<bool> lstIsData; // bool determine if it's a data or not
         std::vector<Client> clients;
         std::string _path;
 };
