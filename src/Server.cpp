@@ -47,7 +47,7 @@ void Server::readInClient(int client, int i)
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "PASV") == 0)
         enteringPassiveMode(client, i);
     else if (commands.size() == 2 && strcmp(commands[0].c_str(), "RETR") == 0)
-        retrFile(client, i, commands[1]);
+        retrFile(i, commands[1]);
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "OK") == 0)
         write(client, "OK\n", 3);
     else

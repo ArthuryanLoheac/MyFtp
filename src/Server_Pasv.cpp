@@ -59,20 +59,12 @@ void Server::enteringPassiveMode(int client, int id)
     //DATA connection
     listen(data, 1);
     int f = fork();
-    if (f == 0) {
-        printf("Data client waiting\n");
-        int dataClient = accept(data, NULL, NULL);
-        if (dataClient == -1) {
+    clients[id].dataFork = f;
+    if (clients[id].dataFork == 0) {
+        clients[id].data = accept(data, NULL, NULL);
+        if (clients[id].data == -1) {
             perror("Error: accept failed");
             exit(1);
         }
-        printf("Data client accepted\n");
-        *a = 2;
-        while (1);
-        close(dataClient);
-        exit(0);
-    } else {
-        sleep(20);
-        printf("%d\n", *a);
     }
 }

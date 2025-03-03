@@ -26,6 +26,8 @@ class Server
             public:
                 Client(int client, struct sockaddr_in adr);
                 int client;
+                int dataFork = -1;
+                int data;
                 struct sockaddr_in adr;
         };
         Server(std::string path, int port);
@@ -36,7 +38,7 @@ class Server
     private:
         struct pollfd *getLstPoll();
         void enteringPassiveMode(int client, int id);
-        void retrFile(int client, int id, std::string path);
+        void retrFile(int id, std::string path);
 
         int serverSocket;
         struct sockaddr_in serverAddr;
