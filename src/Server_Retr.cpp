@@ -7,7 +7,7 @@
 
 #include "Server.hpp"
 
-static void SendFileInSocket(std::string path, std::string _path, int fd)
+static int SendFileInSocket(std::string path, std::string _path, int fd)
 {
     std::string fullPath = _path;
     char buffer[1024];
@@ -19,18 +19,24 @@ static void SendFileInSocket(std::string path, std::string _path, int fd)
     fullPath += path;
     file = open(fullPath.c_str(), O_RDONLY);
     if (file == -1)
-        throw std::runtime_error("Error: could not open file : " + fullPath);
+        return 1;
     size = read(file, buffer, 1024);
     while (size > 0) {
         write(fd, buffer, size);
         size = read(file, buffer, 1024);
     }
+    close(file);
+    return 0;
 }
 
 void Server::retrFile(int id, std::string path)
 {
     if (clients[id].dataFork == 0) {
-        SendFileInSocket(path, _path, clients[id].data);
+        write(clients[id].data, "150 File status okay; about to open data connection.\n", 52);
+        if (SendFileInSocket(path, _path, clients[id].data) == 0)
+            write(clients[id].client, "226 Closing data connection. Requested file action successful.\n", 61);
+        else
+            write(clients[id].client, "550 Requested action not taken. File unavailable.\n", 49);
         close(clients[id].data);
         clients[id].dataFork = -1;
         exit(0);

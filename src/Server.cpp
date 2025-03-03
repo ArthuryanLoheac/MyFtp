@@ -49,7 +49,7 @@ void Server::readInClient(int client, int i)
     else if (commands.size() == 2 && strcmp(commands[0].c_str(), "RETR") == 0)
         retrFile(i, commands[1]);
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "OK") == 0)
-        write(client, "OK\n", 3);
+        write(client, "200 OK\n", 7);
     else
         printf("GOT: %s\n", buffer);
     lstPoll[i].revents = 0;
