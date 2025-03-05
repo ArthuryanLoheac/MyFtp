@@ -12,3 +12,4 @@ unit_tests
 obj/
 myftp
 build
+auto_make.sh
