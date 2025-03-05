@@ -36,7 +36,7 @@ void Server::readInClient(int client, int i)
     char buffer[1024];
     std::vector<std::string> commands;
 
-    printf("READ IN CLIENT %d %d %d\n(", client, i, clients[i].dataFork);
+    printf("READ IN CLIENT %d %d %d\n", client, i, clients[i].dataFork);
     if (!(clients[i].dataFork == 0 || clients[i].dataFork == -1)){
         lstPoll[i].revents = 0;
         return;
@@ -46,9 +46,6 @@ void Server::readInClient(int client, int i)
         if (buffer[j] == '\n' || buffer[j] == '\r')
             buffer[j] = 0;
     commands = split(buffer, ' ');
-    for (size_t j = 0; j < commands.size(); j++)
-        printf("%s/", commands[j].c_str());
-    printf(")\n");
 
     if (commands.size() == 1 && strcmp(commands[0].c_str(), "QUIT") == 0)
         closeClient(i);
