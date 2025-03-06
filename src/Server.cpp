@@ -47,7 +47,7 @@ static bool checkDirectory(std::string path)
     return true;
 }
 
-void Server::commandCwd(int i, std::string path)
+void Server::commandCwd(int i, std::string path, std::string success)
 {
     std::vector<std::string> pathSplit = split(path, '/');
     std::string prev = clients[i]._pathWork;
@@ -75,7 +75,7 @@ void Server::commandCwd(int i, std::string path)
             return;
         }
     }
-    clients[i].print("250 Requested file action okay, completed.\n");
+    clients[i].print(success);
 }
 
 void Server::handleCommand(std::vector<std::string> commands, int client, int i)
@@ -91,7 +91,9 @@ void Server::handleCommand(std::vector<std::string> commands, int client, int i)
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "PWD") == 0)
         clients[i].print("257 \"" + clients[i]._pathWork + "\" created.\n");
     else if (commands.size() == 2 && strcmp(commands[0].c_str(), "CWD") == 0)
-        commandCwd(i, commands[1]);
+        commandCwd(i, commands[1], "250 Requested file action okay, completed.\n");
+    else if (commands.size() == 1 && strcmp(commands[0].c_str(), "CDUP") == 0)
+        commandCwd(i, "..", "200 Command okay.\n");
     else
         clients[i].print("502 Command not implemented\n");
 }

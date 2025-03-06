@@ -43,7 +43,7 @@ class Server
         void retrFile(int id, std::string path);
         void retrXTimes(int id, std::string path);
         void handleCommand(std::vector<std::string> commands, int client, int i);
-        void commandCwd(int i, std::string path);
+        void commandCwd(int i, std::string path, std::string success);
 
         int serverSocket;
         struct sockaddr_in serverAddr;
