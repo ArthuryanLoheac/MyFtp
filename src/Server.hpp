@@ -24,12 +24,13 @@ class Server
     public:
         class Client {
             public:
-                Client(int client, struct sockaddr_in adr);
+                Client(int client, struct sockaddr_in adr, std::string _path);
                 int client;
                 int dataFork = -1;
                 int data;
                 struct sockaddr_in adr;
                 void print(std::string str);
+                std::string _pathWork;
         };
         Server(std::string path, int port);
         void acceptClient();
@@ -42,6 +43,7 @@ class Server
         void retrFile(int id, std::string path);
         void retrXTimes(int id, std::string path);
         void handleCommand(std::vector<std::string> commands, int client, int i);
+        void commandCwd(int i, std::string path);
 
         int serverSocket;
         struct sockaddr_in serverAddr;

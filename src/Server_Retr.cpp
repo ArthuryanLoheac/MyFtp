@@ -19,7 +19,7 @@ static int SendFileInSocket(std::string path, std::string _path, int fd)
     fullPath += path;
     file = open(fullPath.c_str(), O_RDONLY);
     if (file == -1){
-        printf("Error: could not open file %s\n", fullPath.c_str());
+        write(fd, "550 Requested action not taken. File unavailable.\n", 49);
         return 1;
     }
     size = read(file, buffer, 1024);
@@ -35,7 +35,7 @@ void Server::retrFile(int id, std::string path)
 {
     if (clients[id].dataFork == 0) {
         write(clients[id].data, "150 File status okay; about to open data connection.\n", 52);
-        if (SendFileInSocket(path, _path, clients[id].data) == 0)
+        if (SendFileInSocket(path, clients[id]._pathWork, clients[id].data) == 0)
             write(clients[id].client, "226 Closing data connection. Requested file action successful.\n", 63);
         else
             write(clients[id].client, "550 Requested action not taken. File unavailable.\n", 49);
