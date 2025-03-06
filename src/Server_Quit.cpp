@@ -10,6 +10,7 @@
 
 void Server::closeClient(int id)
 {
+    write(clients[id].client, "221 Service closing control connection.\n", 40);
     close(clients[id].client);
     close(clients[id].dataFork);
     close(clients[id].data);
