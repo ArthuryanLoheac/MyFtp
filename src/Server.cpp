@@ -53,6 +53,8 @@ void Server::handleCommand(std::vector<std::string> commands, int client, int i)
         help(i);
     else if (commands.size() == 2 && strcmp(commands[0].c_str(), "HELP") == 0)
         help(i, commands[1]);
+    else if (commands.size() == 2 && strcmp(commands[0].c_str(), "DELE") == 0)
+        deleteFile(i, commands[1]);
     else
         clients[i].print("502 Command not implemented\n");
 }

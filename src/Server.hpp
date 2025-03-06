@@ -59,6 +59,8 @@ class Server
         void help(int i, std::string command);
         void helpCommandsRegister();
 
+        void deleteFile(int i, std::string path);
+
         int serverSocket;
         struct sockaddr_in serverAddr;
         std::vector<struct pollfd> lstPoll;

@@ -24,7 +24,6 @@ void Server::helpCommandsRegister()
     _commandsHelp["LIST"] = "LIST [<SP> <pathname>] <CRLF>";
     _commandsHelp["STOR"] = "STOR <SP> <pathname> <CRLF>";
 }
-
 void Server::help(int i)
 {
     clients[i].print("214-The following commands are recognized.\n");
