@@ -35,6 +35,11 @@ class Server
                 struct sockaddr_in adr;
                 void print(std::string str);
                 std::string _pathWork;
+
+                std::string _username = "";
+                bool _isUsername = false;
+                std::string _password = "";
+                bool _isPassword = false;
         };
         Server(std::string path, int port);
         void acceptClient();
@@ -44,6 +49,7 @@ class Server
     private:
         struct pollfd *getLstPoll();
         void handleCommand(std::vector<std::string> commands, int client, int i);
+        bool handleCommandConnected(std::vector<std::string> commands, int i);
 
         void enteringPassiveMode(int client, int id);
         
@@ -60,6 +66,9 @@ class Server
         void helpCommandsRegister();
 
         void deleteFile(int i, std::string path);
+
+        void userConnect(int i, std::string username);
+        void passConnect(int i, std::string password);
 
         int serverSocket;
         struct sockaddr_in serverAddr;

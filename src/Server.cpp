@@ -33,6 +33,21 @@ static std::vector<std::string> split(const std::string &str, char delim)
     return tokens;
 }
 
+bool Server::handleCommandConnected(std::vector<std::string> commands, int i)
+{
+    if (commands.size() == 1 && strcmp(commands[0].c_str(), "USER") == 0) {
+        userConnect(i, "anonymous");
+    } else if (commands.size() == 1 && strcmp(commands[0].c_str(), "PASS") == 0) {
+        passConnect(i, "anonymous");
+    } else if (commands.size() == 2 && strcmp(commands[0].c_str(), "USER") == 0) {  
+        userConnect(i, commands[1]);
+    } else if (commands.size() == 2 && strcmp(commands[0].c_str(), "PASS") == 0) {  
+        passConnect(i, commands[1]);
+    } else
+        return false;
+    return true;
+}
+
 void Server::handleCommand(std::vector<std::string> commands, int client, int i)
 {
     if (commands.size() == 1 && strcmp(commands[0].c_str(), "QUIT") == 0)
@@ -72,7 +87,12 @@ void Server::readInClient(int client, int i)
     for (int j = 0; buffer[j]; j++)
         if (buffer[j] == '\n' || buffer[j] == '\r')
             buffer[j] = 0;
-    handleCommand(split(buffer, ' '), client, i);
+    if (handleCommandConnected(split(buffer, ' '), i) == false) {
+        if (clients[i]._isUsername == false || clients[i]._isPassword == false)
+            clients[i].print("530 Please login with USER and PASS.\n");
+        else
+            handleCommand(split(buffer, ' '), client, i);
+    }
     lstPoll[i].revents = 0;
 }
 
