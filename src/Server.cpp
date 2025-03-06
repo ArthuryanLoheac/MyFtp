@@ -43,6 +43,8 @@ void Server::handleCommand(std::vector<std::string> commands, int client, int i)
         retrXTimes(i, commands[1]);
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "NOOP") == 0)
         clients[i].print("200 Command okay\n");
+    else if (commands.size() == 1 && strcmp(commands[0].c_str(), "PWD") == 0)
+        clients[i].print("257 \"" + _path + "\" created.\n");
     else
         printf("502 Command not implemented\n");
 }
