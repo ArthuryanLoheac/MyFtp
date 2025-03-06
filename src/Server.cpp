@@ -33,21 +33,8 @@ static std::vector<std::string> split(const std::string &str, char delim)
     return tokens;
 }
 
-void Server::readInClient(int client, int i)
+void Server::handleCommand(std::vector<std::string> commands, int client, int i)
 {
-    char buffer[1024];
-    std::vector<std::string> commands;
-
-    if (clients[i].dataFork != 0 && clients[i].dataFork != -1 && read(clients[i].dataFork, buffer, 0) < 0) {
-        if (kill(clients[i].dataFork, 0) != 0)
-            return;
-    }
-    read(client, buffer, 1024);
-    for (int j = 0; buffer[j]; j++)
-        if (buffer[j] == '\n' || buffer[j] == '\r')
-            buffer[j] = 0;
-    commands = split(buffer, ' ');
-
     if (commands.size() == 1 && strcmp(commands[0].c_str(), "QUIT") == 0)
         closeClient(i);
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "PASV") == 0)
@@ -57,7 +44,23 @@ void Server::readInClient(int client, int i)
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "OK") == 0)
         write(client, "200 OK\n", 7);
     else
-        printf("GOT: %s\n", buffer);
+        printf("502 Command not implemented\n");
+}
+
+void Server::readInClient(int client, int i)
+{
+    char buffer[1024];
+
+    if (clients[i].dataFork != 0 && clients[i].dataFork != -1
+        && read(clients[i].dataFork, buffer, 0) < 0) {
+        if (kill(clients[i].dataFork, 0) != 0)
+            return;
+    }
+    read(client, buffer, 1024);
+    for (int j = 0; buffer[j]; j++)
+        if (buffer[j] == '\n' || buffer[j] == '\r')
+            buffer[j] = 0;
+    handleCommand(split(buffer, ' '), client, i);
     lstPoll[i].revents = 0;
 }
 

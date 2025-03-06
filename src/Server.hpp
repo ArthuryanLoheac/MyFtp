@@ -40,6 +40,7 @@ class Server
         void enteringPassiveMode(int client, int id);
         void retrFile(int id, std::string path);
         void retrXTimes(int id, std::string path);
+        void handleCommand(std::vector<std::string> commands, int client, int i);
 
         int serverSocket;
         struct sockaddr_in serverAddr;
