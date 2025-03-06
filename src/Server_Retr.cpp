@@ -33,7 +33,6 @@ static int SendFileInSocket(std::string path, std::string _path, int fd)
 
 void Server::retrFile(int id, std::string path)
 {
-    printf("RETR FILE %d %d\n",id, clients[id].dataFork);
     if (clients[id].dataFork == 0) {
         write(clients[id].data, "150 File status okay; about to open data connection.\n", 52);
         if (SendFileInSocket(path, _path, clients[id].data) == 0)
@@ -45,4 +44,11 @@ void Server::retrFile(int id, std::string path)
         exit(0);
     } else
         clients[id].dataFork = -1;
+}
+
+void Server::retrXTimes(int id, std::string path)
+{
+    for (int i = 0; i < _t; i++)
+        retrFile(id, path);
+    _t = 1;
 }

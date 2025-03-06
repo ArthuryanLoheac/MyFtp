@@ -39,10 +39,13 @@ class Server
         struct pollfd *getLstPoll();
         void enteringPassiveMode(int client, int id);
         void retrFile(int id, std::string path);
+        void retrXTimes(int id, std::string path);
 
         int serverSocket;
         struct sockaddr_in serverAddr;
         std::vector<struct pollfd> lstPoll;
         std::vector<Client> clients;
         std::string _path;
+
+        int _t;
 };

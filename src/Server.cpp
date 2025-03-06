@@ -6,9 +6,11 @@
 */
 
 #include "Server.hpp"
+#include <signal.h>
 
 Server::Server(std::string path, int port)
 {
+    _t = 3;
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     serverAddr = {AF_INET, htons(port), INADDR_ANY, 0};
 
@@ -36,10 +38,9 @@ void Server::readInClient(int client, int i)
     char buffer[1024];
     std::vector<std::string> commands;
 
-    printf("READ IN CLIENT %d %d %d\n", client, i, clients[i].dataFork);
-    if (!(clients[i].dataFork == 0 || clients[i].dataFork == -1)){
-        lstPoll[i].revents = 0;
-        return;
+    if (clients[i].dataFork != 0 && clients[i].dataFork != -1 && read(clients[i].dataFork, buffer, 0) < 0) {
+        if (kill(clients[i].dataFork, 0) != 0)
+            return;
     }
     read(client, buffer, 1024);
     for (int j = 0; buffer[j]; j++)
@@ -52,7 +53,7 @@ void Server::readInClient(int client, int i)
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "PASV") == 0)
         enteringPassiveMode(client, i);
     else if (commands.size() == 2 && strcmp(commands[0].c_str(), "RETR") == 0)
-        retrFile(i, commands[1]);
+        retrXTimes(i, commands[1]);
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "OK") == 0)
         write(client, "200 OK\n", 7);
     else
@@ -83,15 +84,16 @@ void Server::run()
     int nbEvents;
 
     while(1) {
-        nbEvents = poll(getLstPoll(), clients.size() + 1, 1);
+        nbEvents = poll(getLstPoll(), clients.size() + 1, -1);
         if (nbEvents == -1)
             throw std::runtime_error("Error: poll failed");
         for (int i = 0; i < nbEvents; i++) {
             if (lstPoll[0].revents & POLLIN)
                 acceptClient();
             for (size_t i = 1; i < clients.size() + 1; i++) {
-                if (lstPoll[i].revents & POLLIN)
+                if (lstPoll[i].revents & POLLIN){
                     readInClient(clients[i - 1].client, i - 1);
+                }
             }
         }
     }
