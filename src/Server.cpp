@@ -41,8 +41,8 @@ void Server::handleCommand(std::vector<std::string> commands, int client, int i)
         enteringPassiveMode(client, i);
     else if (commands.size() == 2 && strcmp(commands[0].c_str(), "RETR") == 0)
         retrXTimes(i, commands[1]);
-    else if (commands.size() == 1 && strcmp(commands[0].c_str(), "OK") == 0)
-        write(client, "200 OK\n", 7);
+    else if (commands.size() == 1 && strcmp(commands[0].c_str(), "NOOP") == 0)
+        clients[i].print("200 Command okay\n");
     else
         printf("502 Command not implemented\n");
 }
@@ -105,4 +105,9 @@ void Server::run()
 Server::Client::Client(int client, sockaddr_in adr)
     : client(client), adr(adr)
 {
+}
+
+void Server::Client::print(std::string str)
+{
+    write(client, str.c_str(), str.size());
 }

@@ -29,6 +29,7 @@ class Server
                 int dataFork = -1;
                 int data;
                 struct sockaddr_in adr;
+                void print(std::string str);
         };
         Server(std::string path, int port);
         void acceptClient();
