@@ -6,10 +6,6 @@
 */
 
 #include "Server.hpp"
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
 
 Server::Server(std::string path, int port)
 {
@@ -23,6 +19,7 @@ Server::Server(std::string path, int port)
     if (listen(serverSocket, 10) == -1)
         throw std::runtime_error("Error: listen failed");
     lstPoll.push_back({serverSocket, POLLIN, 0});
+    helpCommandsRegister();
 }
 
 static std::vector<std::string> split(const std::string &str, char delim)
@@ -34,48 +31,6 @@ static std::vector<std::string> split(const std::string &str, char delim)
     while (std::getline(tokenStream, token, delim))
         tokens.push_back(token);
     return tokens;
-}
-
-static bool checkDirectory(std::string path)
-{
-    struct stat pathStat;
- 
-    if (path != "." && access(path.c_str(), F_OK) == -1)
-        return false;
-    if (stat(path.c_str(), &pathStat) != 0 || !S_ISDIR(pathStat.st_mode))
-        return false;
-    return true;
-}
-
-void Server::commandCwd(int i, std::string path, std::string success)
-{
-    std::vector<std::string> pathSplit = split(path, '/');
-    std::string prev = clients[i]._pathWork;
-
-    for (size_t j = 0; j < pathSplit.size(); j++) {
-        prev = clients[i]._pathWork;
-        if (strcmp(pathSplit[j].c_str(), "..") == 0) {
-            if (strcmp(_path.c_str(), clients[i]._pathWork.c_str()) == 0) {
-                clients[i].print("550 Can't go above parent directory.\n");
-                return;
-            } else {
-                clients[i]._pathWork = clients[i]._pathWork.substr(0, clients[i]._pathWork.size() - 1);
-                while (clients[i]._pathWork[clients[i]._pathWork.size() - 1] != '/')
-                    clients[i]._pathWork = clients[i]._pathWork.substr(0, clients[i]._pathWork.size() - 1);
-                clients[i]._pathWork = clients[i]._pathWork.substr(0, clients[i]._pathWork.size() - 1);
-            }
-        } else if (strcmp(pathSplit[j].c_str(), ".") != 0) {
-            if (clients[i]._pathWork[clients[i]._pathWork.size() - 1] != '/')
-                clients[i]._pathWork += "/";
-            clients[i]._pathWork += pathSplit[j];
-        }
-        if (!checkDirectory(clients[i]._pathWork)) {
-            clients[i]._pathWork = prev;
-            clients[i].print("550 Can't change directory to " + path + "\n");
-            return;
-        }
-    }
-    clients[i].print(success);
 }
 
 void Server::handleCommand(std::vector<std::string> commands, int client, int i)
@@ -94,6 +49,10 @@ void Server::handleCommand(std::vector<std::string> commands, int client, int i)
         commandCwd(i, commands[1], "250 Requested file action okay, completed.\n");
     else if (commands.size() == 1 && strcmp(commands[0].c_str(), "CDUP") == 0)
         commandCwd(i, "..", "200 Command okay.\n");
+    else if (commands.size() == 1 && strcmp(commands[0].c_str(), "HELP") == 0)
+        help(i);
+    else if (commands.size() == 2 && strcmp(commands[0].c_str(), "HELP") == 0)
+        help(i, commands[1]);
     else
         clients[i].print("502 Command not implemented\n");
 }

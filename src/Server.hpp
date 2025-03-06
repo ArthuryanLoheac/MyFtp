@@ -18,6 +18,10 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <sstream>
+#include <map>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 class Server
 {
@@ -39,17 +43,29 @@ class Server
         void readInClient(int client, int i);
     private:
         struct pollfd *getLstPoll();
+        void handleCommand(std::vector<std::string> commands, int client, int i);
+
         void enteringPassiveMode(int client, int id);
+        
         void retrFile(int id, std::string path);
         void retrXTimes(int id, std::string path);
-        void handleCommand(std::vector<std::string> commands, int client, int i);
+
         void commandCwd(int i, std::string path, std::string success);
+        bool checkDir(std::string path, int i, std::string prev);
+        void moveTo(std::string path, int i);
+        void commandCdup(int i);
+
+        void help(int i);
+        void help(int i, std::string command);
+        void helpCommandsRegister();
 
         int serverSocket;
         struct sockaddr_in serverAddr;
         std::vector<struct pollfd> lstPoll;
         std::vector<Client> clients;
         std::string _path;
+
+        std::map<std::string, std::string> _commandsHelp;
 
         int _t;
 };
