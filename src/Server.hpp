@@ -32,11 +32,23 @@ class Server
         void run();
         void readClient(size_t &i);
         void closeClient(int i);
-        void handleCommand(std::string command, int i);
+        void handleCommand(std::vector<std::string> commands, int i);
+        void handleCommandConnected(std::vector<std::string> commands, int i);
+
+        void command_user(std::string user, int i);
+        void command_pass(std::string pass, int i);
     
     private:
+        enum ConnectedType {
+            B_USER = 0,
+            B_PASS = 1,
+            S_USER = 2,
+            S_PASS = 3
+        };
         std::string _path;
         int _port;
         std::vector<pollfd> fds;
+        std::vector<std::tuple<bool, bool, std::string, std::string>> _connected; 
+            // bool = user, bool = pass, string = user, string = pass
         int server_fd;
 };

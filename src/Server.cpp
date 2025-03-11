@@ -29,6 +29,7 @@ void Server::ServerInit()
     if (listen(server_fd, 3) < 0)
         throw std::runtime_error("Listen failed");
     fds.push_back({server_fd, POLLIN, 0});
+    _connected.push_back({true, true, "", ""});
 }
 
 void Server::ServerAccept()
@@ -38,6 +39,7 @@ void Server::ServerAccept()
         if (new_socket < 0)
             throw std::runtime_error("Accept failed");
         fds.push_back({new_socket, POLLIN, 0});
+        _connected.push_back({false, false, "", ""});
     }
 }
 
@@ -58,6 +60,9 @@ void Server::readClient(size_t &i)
 {
     char buffer[1024] = {0};
     int valread = read(fds[i].fd, buffer, 1024);
+    std::vector<std::string> commands;
+    std::string command;
+
     if (valread <= 0) {
         closeClient(i);
         i--;
@@ -66,12 +71,16 @@ void Server::readClient(size_t &i)
     for (int i = 0; buffer[i]; i++)
         if (buffer[i] == '\n' || buffer[i] == '\r')
             buffer[i] = 0;
-    handleCommand(buffer, i);
+    std::stringstream ss(buffer);
+    while (std::getline(ss, command, ' '))
+        commands.push_back(command);
+    handleCommand(commands, i);
 }
 
 void Server::closeClient(int i)
 {
     close(fds[i].fd);
     fds.erase(fds.begin() + i);
+    _connected.erase(_connected.begin() + i);
 }
 
