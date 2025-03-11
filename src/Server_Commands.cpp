@@ -9,11 +9,9 @@
 
 void Server::handleCommand(std::string command, int i)
 {
-    for (size_t j = 0; j < command.size(); j++)
-        if (command[j] == '\r' || command[j] == '\n')
-            command[j] = '\0';
-    if (strcmp(command.c_str(), "QUIT") == 0)
+    if (strcmp(command.c_str(), "QUIT") == 0) {
+        dprintf(fds[i].fd, "221 Service closing control connection.\r\n");
         closeClient(i);
-    else
+    } else
         dprintf(fds[i].fd, "500 Unknown command.\r\n");
 }

@@ -63,6 +63,9 @@ void Server::readClient(size_t &i)
         i--;
         return;
     }
+    for (int i = 0; buffer[i]; i++)
+        if (buffer[i] == '\n' || buffer[i] == '\r')
+            buffer[i] = 0;
     handleCommand(buffer, i);
 }
 
