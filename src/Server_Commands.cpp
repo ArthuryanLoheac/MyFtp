@@ -7,7 +7,7 @@
 
 #include "Server.hpp"
 
-static void sendResponse(int fd, std::string response)
+void Server::sendResponse(int fd, std::string response)
 {
     write(fd, response.c_str(), response.size());
 }
@@ -27,15 +27,6 @@ void Server::handleCommand(std::vector<std::string> commands, int i)
         handleCommandConnected(commands, i);
     } else {
         sendResponse(fds[i].fd, "530 Not logged in.\r\n");
-    }
-}
-
-void Server::handleCommandConnected(std::vector<std::string> commands, int i)
-{
-    if (commands.size() == 1 && strcmp(commands[0].c_str(), "NOOP") == 0) {
-        sendResponse(fds[i].fd, "200 Command okay.\r\n");
-    } else {
-        sendResponse(fds[i].fd, "500 Unknown command.\r\n");
     }
 }
 

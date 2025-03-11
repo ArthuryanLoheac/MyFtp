@@ -34,6 +34,7 @@ class Server
         void closeClient(int i);
         void handleCommand(std::vector<std::string> commands, int i);
         void handleCommandConnected(std::vector<std::string> commands, int i);
+        void sendResponse(int fd, std::string response);
 
         void command_user(std::string user, int i);
         void command_pass(std::string pass, int i);
@@ -43,12 +44,13 @@ class Server
             B_USER = 0,
             B_PASS = 1,
             S_USER = 2,
-            S_PASS = 3
+            S_PASS = 3,
+            S_PATH = 4
         };
         std::string _path;
         int _port;
         std::vector<pollfd> fds;
-        std::vector<std::tuple<bool, bool, std::string, std::string>> _connected; 
-            // bool = user, bool = pass, string = user, string = pass
+        std::vector<std::tuple<bool, bool, std::string, std::string, std::string>> _connected; 
+            // bool = user, bool = pass, string = user, string = pass, string = path
         int server_fd;
 };

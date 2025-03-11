@@ -29,7 +29,7 @@ void Server::ServerInit()
     if (listen(server_fd, 3) < 0)
         throw std::runtime_error("Listen failed");
     fds.push_back({server_fd, POLLIN, 0});
-    _connected.push_back({true, true, "", ""});
+    _connected.push_back({true, true, "", "", _path});
 }
 
 void Server::ServerAccept()
@@ -39,7 +39,7 @@ void Server::ServerAccept()
         if (new_socket < 0)
             throw std::runtime_error("Accept failed");
         fds.push_back({new_socket, POLLIN, 0});
-        _connected.push_back({false, false, "", ""});
+        _connected.push_back({false, false, "", "", _path});
     }
 }
 
