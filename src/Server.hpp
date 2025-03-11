@@ -39,6 +39,7 @@ class Server
         void command_user(std::string user, int i);
         void command_pass(std::string pass, int i);
         void commandCwd(std::string path, int i, std::string message);
+        void commandDele(std::string path, int i);
     
     private:
         enum ConnectedType {
