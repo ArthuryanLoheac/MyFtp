@@ -30,8 +30,9 @@ class Server
         void ServerInit();
         void ServerAccept();
         void run();
-        void readClient(int i);
+        void readClient(size_t &i);
         void closeClient(int i);
+        void handleCommand(std::string command, int i);
     
     private:
         std::string _path;

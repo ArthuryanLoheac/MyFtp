@@ -54,7 +54,7 @@ void Server::run()
     }
 }
 
-void Server::readClient(int i)
+void Server::readClient(size_t &i)
 {
     char buffer[1024] = {0};
     int valread = read(fds[i].fd, buffer, 1024);
@@ -63,7 +63,7 @@ void Server::readClient(int i)
         i--;
         return;
     }
-    write(fds[i].fd, buffer, valread);
+    handleCommand(buffer, i);
 }
 
 void Server::closeClient(int i)
@@ -71,3 +71,4 @@ void Server::closeClient(int i)
     close(fds[i].fd);
     fds.erase(fds.begin() + i);
 }
+
