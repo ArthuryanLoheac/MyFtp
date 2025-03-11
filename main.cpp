@@ -14,8 +14,13 @@
 
 int startServer(int port, std::string path)
 {
-    Server server(path, port);
-    server.run();
+    try {
+        Server server(path, port);
+        server.run();
+    } catch (std::exception &e) {
+        std::cerr << e.what() << std::endl;
+        return 84;
+    }
     return 0;
 }
 
