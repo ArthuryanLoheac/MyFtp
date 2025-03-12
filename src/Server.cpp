@@ -12,6 +12,17 @@ Server::Server(std::string path, int port)
     _path = path;
     _port = port;
     ServerInit();
+
+    _commands["USER"] = "USER <SP> <username> <CRLF> : Specify user for authentication\n";
+    _commands["PASS"] = "PASS <SP> <password> <CRLF> : Specify password for authentication\n";
+    _commands["CWD"] = "CWD  <SP> <pathname> <CRLF> : Change working directory\n";
+    _commands["DELE"] = "DELE <SP> <pathname> <CRLF> : Delete file\n";
+    _commands["HELP"] = "HELP [<SP> <string>] <CRLF> : List available commands\n";
+    _commands["QUIT"] = "QUIT <CRLF> : Terminate the connection\n";
+    _commands["NOOP"] = "NOOP <CRLF> : Do nothing\n";
+    _commands["PWD"] = "PWD <CRLF> : Print working directory\n";
+    _commands["CDUP"] = "CDUP <CRLF> : Change to parent directory\n";
+
 }
 
 void Server::ServerInit()

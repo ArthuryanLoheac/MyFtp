@@ -25,6 +25,10 @@ void Server::handleCommand(std::vector<std::string> commands, int i)
         command_pass(commands[1], i);
     } else if (std::get<0>(_connected[i]) && std::get<1>(_connected[i])) {
         handleCommandConnected(commands, i);
+    } else if (commands.size() == 1 && strcmp(commands[0].c_str(), "HELP") == 0) {
+        commandHelp(i);
+    } else if (commands.size() == 2 && strcmp(commands[0].c_str(), "HELP") == 0) {
+        commandHelp(commands[1], i);
     } else {
         sendResponse(fds[i].fd, "530 Not logged in.\r\n");
     }

@@ -40,6 +40,8 @@ class Server
         void command_pass(std::string pass, int i);
         void commandCwd(std::string path, int i, std::string message);
         void commandDele(std::string path, int i);
+        void commandHelp(int i);
+        void commandHelp(std::string path, int i);
     
     private:
         enum ConnectedType {
@@ -55,4 +57,5 @@ class Server
         std::vector<std::tuple<bool, bool, std::string, std::string, std::string>> _connected; 
             // bool = user, bool = pass, string = user, string = pass, string = path
         int server_fd;
+        std::map<std::string, std::string> _commands;
 };

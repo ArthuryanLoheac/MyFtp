@@ -61,6 +61,23 @@ void Server::commandDele(std::string path, int i)
     sendResponse(fds[i].fd, "550 Failed to delete file.\r\n");
 }
 
+void Server::commandHelp(int i)
+{
+    sendResponse(fds[i].fd, "214 The following commands are recognized.\r\n");
+    sendResponse(fds[i].fd, "USER PASS PWD CWD CDUP DELE NOOP HELP QUIT\r\n");
+    sendResponse(fds[i].fd, "214 Help OK.\r\n");
+}
+
+void Server::commandHelp(std::string path, int i)
+{
+    try {
+        std::string help = _commands.at(path);
+        sendResponse(fds[i].fd, "214 " + help);
+    } catch (const std::out_of_range &e) {
+        sendResponse(fds[i].fd, "500 Unknown command.\r\n");
+    }
+}
+
 void Server::handleCommandConnected(std::vector<std::string> commands, int i)
 {
     if (commands.size() == 1 && strcmp(commands[0].c_str(), "NOOP") == 0) {
